@@ -1,62 +1,40 @@
 package ru.netology.interfaces;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
 public class CallbackTest {
-    //private WebDriver driver;
     private String dateAllowable;
 
     @BeforeAll
     static void setUpAll() {
-        //System.setProperty("webdriver.chrome.driver", "webdriver//chromedriver");
         WebDriverManager.chromedriver().setup();
     }
 
     String generateDate(int days) {
-//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-//        return dtf.format(LocalDateTime.now().plusDays(days));
         return LocalDateTime.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
     @BeforeEach
     void setUp() {
-//        ChromeOptions options = new ChromeOptions();
-//        options.addArguments("start-maximized");
-//        options.addArguments("disable-infobars");
-//        options.addArguments("--disable-dev-shm-usage");
-//        options.addArguments("--no-sandbox");
-//        options.addArguments("--headless");
-//        options.addArguments("--disable-extensions");
-//        options.addArguments("--no-sandbox");
-//        driver = new ChromeDriver(options);
+
         open("http://localhost:9999");
         dateAllowable = generateDate(4);
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        if (driver != null) {
-//            driver.quit();
-//        }
-//    }
 
     @Test
     void shouldSubmitRequestSuccess() {
@@ -180,4 +158,20 @@ public class CallbackTest {
         form.$(".button").click();
         form.$("[data-test-id=city].input_invalid .input__sub").shouldHave(exactText("Доставка в выбранный город недоступна"));
     }
+
+    @Test
+    void shouldSubmitRequestSuccessChecDate() {
+        SelenideElement form =$(".form");
+        form.$("[data-test-id=city] input").setValue("Нижний Новгород");
+        form.$("[data-test-id=date] input").doubleClick();
+        form.$("[data-test-id=date] input").sendKeys(Keys.BACK_SPACE);
+        form.$("[data-test-id=date] input").setValue(dateAllowable);
+        form.$("[data-test-id=name] input").setValue("Василий Маршал-Передовой");
+        form.$("[data-test-id=phone] input").setValue("+79270000000");
+        form.$("[data-test-id=agreement]").click();
+        form.$(".button").click();
+        $("[data-test-id=notification] .notification__content").shouldHave(Condition.text("Встреча успешно забронирована на " + dateAllowable), Duration.ofSeconds(15));
+    }
+
+
 }
