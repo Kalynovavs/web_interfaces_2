@@ -21,9 +21,7 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
 public class CallbackTest {
-    private WebDriver driver;
-    private LocalDateTime dateNow;
-    private DateTimeFormatter dtf;
+    //private WebDriver driver;
     private String dateAllowable;
 
     @BeforeAll
@@ -32,29 +30,33 @@ public class CallbackTest {
         WebDriverManager.chromedriver().setup();
     }
 
-    @BeforeEach
-    void setUp() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("start-maximized");
-        options.addArguments("disable-infobars");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--headless");
-        options.addArguments("--disable-extensions");
-        options.addArguments("--no-sandbox");
-        driver = new ChromeDriver(options);
-        open("http://localhost:9999");
-        dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        dateNow = LocalDateTime.now();
-        dateAllowable = dtf.format(dateNow.plusDays(4));
+    String generateDate(int days) {
+//        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+//        return dtf.format(LocalDateTime.now().plusDays(days));
+        return LocalDateTime.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
-    @AfterEach
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    @BeforeEach
+    void setUp() {
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("start-maximized");
+//        options.addArguments("disable-infobars");
+//        options.addArguments("--disable-dev-shm-usage");
+//        options.addArguments("--no-sandbox");
+//        options.addArguments("--headless");
+//        options.addArguments("--disable-extensions");
+//        options.addArguments("--no-sandbox");
+//        driver = new ChromeDriver(options);
+        open("http://localhost:9999");
+        dateAllowable = generateDate(4);
     }
+
+//    @AfterEach
+//    void tearDown() {
+//        if (driver != null) {
+//            driver.quit();
+//        }
+//    }
 
     @Test
     void shouldSubmitRequestSuccess() {
@@ -157,7 +159,7 @@ public class CallbackTest {
         form.$("[data-test-id=city] input").setValue("Нижний Новгород");
         form.$("[data-test-id=date] input").doubleClick();
         form.$("[data-test-id=date] input").sendKeys(Keys.BACK_SPACE);
-        form.$("[data-test-id=date] input").setValue(dtf.format(dateNow.plusDays(1)));
+        form.$("[data-test-id=date] input").setValue(generateDate(1));
         form.$("[data-test-id=name] input").setValue("Василий Маршал-Передовой");
         form.$("[data-test-id=phone] input").setValue("+79270000000");
         form.$("[data-test-id=agreement]").click();
